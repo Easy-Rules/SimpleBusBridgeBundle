@@ -1,0 +1,20 @@
+services:
+
+    easy_business_rules_simple_bus_bridge.engine.simple_bus_expression_engine:
+        class: EasyRules\SimpleBusBridgeBundle\Engine\SimpleBusExpressionEngine
+        arguments: [ "@simple_bus.command_bus", "@simple_bus.event_bus" ]
+
+    easy_business_rules_simple_bus_bridge.simple_bus_middleware.easy_business_rules_middleware:
+        class: EasyRules\SimpleBusBridgeBundle\SimpleBus\Middleware\EasyRulesMiddleware
+        arguments:
+            - "@easy_business_rules_engine.infrastructure_doctrine_orm.logic_repository"
+            - "@easy_business_rules_simple_bus_bridge.engine.simple_bus_expression_engine"
+            - "@simple_bus.command_bus.command_handler_resolver"
+            - "@simple_bus.asynchronous.command_bus.command_handler_resolver"
+        public: false
+        tags:
+            - { name: command_bus_middleware, priority: 1 }
+
+    easy_business_rules_simple_bus_bridge.reader.available_commands_reader:
+        class: EasyRules\SimpleBusBridgeBundle\Reader\AvailableCommandsReader
+        arguments: [ "@simple_bus.command_bus.command_handler_map", "@simple_bus.asynchronous.command_bus.command_handler_map" ]
